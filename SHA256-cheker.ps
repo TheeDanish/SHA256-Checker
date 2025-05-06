@@ -1,0 +1,23 @@
+# Open File Explorer to select a file
+$File = New-Object System.Windows.Forms.OpenFileDialog
+$File.Title = "Select a file to verify SHA-256"
+$File.Filter = "All Files (*.*)|*.*"
+
+if ($File.ShowDialog() -eq "OK") {
+    $FilePath = $File.FileName
+    
+    # Compute SHA-256 hash
+    $SHA256 = Get-FileHash -Path $FilePath -Algorithm SHA256
+    
+    # Ask user for expected hash
+    $ExpectedHash = Read-Host "Enter the expected SHA-256 hash"
+    
+    # Compare and output result
+    if ($SHA256.Hash -eq $ExpectedHash) {
+        Write-Host "Hash match: The file is verified." -ForegroundColor Green
+    } else {
+        Write-Host "Hash mismatch: The file may be altered or corrupted." -ForegroundColor Red
+    }
+} else {
+    Write-Host "No file selected. Exiting..." -ForegroundColor Yellow
+}
